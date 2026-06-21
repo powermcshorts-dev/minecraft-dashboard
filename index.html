@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decay SMP | Dashboard</title>
+    <!-- Primary Styles -->
+    <link rel="stylesheet" href="style.css?v=42">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Odometer.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/themes/odometer-theme-minimal.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/odometer.js/0.4.8/odometer.min.js"></script>
+    <link rel="icon" type="image/png" href="logo.png">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="logo.png" alt="Decay SMP Logo" class="logo-img">
+                    <h1 class="logo-text">DECAY<span>SMP</span></h1>
+                </div>
+
+                <div class="theme-switcher">
+                    <button class="theme-btn active" data-theme="abyss" title="Abyss Theme"><i class="fa-solid fa-moon"></i></button>
+                    <button class="theme-btn" data-theme="quartz" title="Decay Theme"><i class="fa-solid fa-sun"></i></button>
+                    <button class="theme-btn" data-theme="crimson" title="Crimson Theme"><i class="fa-solid fa-fire"></i></button>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-item active" id="nav-players">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Players</span>
+                </div>
+                <div class="nav-item" id="nav-leaderboards">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Leaderboards</span>
+                </div>
+                <div class="nav-item" id="nav-health">
+                    <i class="fa-solid fa-microchip"></i>
+                    <span>Server Health</span>
+                </div>
+                <div class="nav-item" id="nav-faq">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>FAQ / Guide</span>
+                </div>
+                <div class="nav-item" id="nav-teams">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Teams</span>
+                </div>
+                <div class="nav-item" id="nav-events">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <span>Live Events</span>
+                </div>
+
+                <!-- Live Activity Widget -->
+                <div class="live-activity-widget">
+                    <div class="live-activity-header">
+                        <h3>Live Broadcast</h3>
+                        <div class="pulse-dot"></div>
+                    </div>
+                    <div id="live-activity-feed">
+                        <div class="live-log-item" style="justify-content: center; color: var(--text-muted); font-size: 0.75rem;">
+                            Monitoring activity...
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="server-status-card">
+                <div class="status-header">
+                    <span class="server-name">Decaysmp</span>
+                    <div class="status-badge">
+                        <div class="status-indicator online"></div>
+                        <span class="status-text">Online</span>
+                    </div>
+                </div>
+                <div class="server-ip-container" onclick="copyServerAddress(event)" title="Click to copy server address">
+                    <span id="server-address">earth.kaarmacloud.fun:19059</span>
+                    <i class="fa-solid fa-copy copy-icon"></i>
+                </div>
+                <div class="server-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Session</span>
+                        <span class="metric-value" id="online-count">0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Decay SMP v2.6</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="player-search" placeholder="Search database...">
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" id="btn-refresh" title="Refesh Data">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="viewport">
+
+
+                <!-- Players Grid -->
+                <section id="players-section">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>Player Database</h2>
+                            <p>Real-time telemetry for verified SMP members.</p>
+                        </div>
+                        <div class="sort-controls">
+                            <label for="sort-by">Sort:</label>
+                            <select id="sort-by">
+                                <option value="rating" selected>Overall OVR</option>
+                                <option value="kills">Kills</option>
+                                <option value="playtime">Playtime</option>
+                                <option value="mined">Total Mined</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="player-grid" id="player-grid">
+                        <div class="loading-state"><div class="spinner"></div><p>Synchronizing...</p></div>
+                    </div>
+                </section>
+
+                <!-- Leaderboard Tab -->
+                <section id="leaderboard-section" style="display: none;">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>Global Competition Standings</h2>
+                            <p>Real-time ELO distribution and combat ranking.</p>
+                        </div>
+                    </div>
+
+
+                    <div class="player-grid" id="leaderboard-grid">
+                        <div class="loading-state"><div class="spinner"></div><p>Calculating rankings...</p></div>
+                    </div>
+                </section>
+
+                <!-- FAQ Section -->
+                <section id="faq-section" style="display: none;">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>FAQ &amp; Guide</h2>
+                            <p>Everything you need to know about the Decay SMP dashboard.</p>
+                        </div>
+                    </div>
+                    <div class="faq-list">
+                        <div class="faq-card">
+                            <div class="faq-q">🗺️ What is this dashboard?</div>
+                            <div class="faq-a">This is the Decay SMP live stats dashboard. It shows real-time player data, server health, and competitive rankings — all synced automatically from the Minecraft server every 30 seconds.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">👥 What does the Players tab show?</div>
+                            <div class="faq-a">The Players tab shows all registered SMP members as a grid of cards. Click any card to open a detailed stat panel showing their kills, deaths, K/D ratio, blocks mined, playtime, and more. Online players are highlighted.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">🏆 What is the Leaderboard?</div>
+                            <div class="faq-a">The Leaderboard ranks the players by their Overall (OVR) rating by default. You can switch the sort to Kills, Playtime, or Total Mined using the dropdown. The top 3 players get special styling highlights.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">⚡ How are Player Ratings calculated?</div>
+                            <div class="faq-a">Player ratings range from 1 to 99 and are calculated server-side based on your performance relative to other players:<br><br>
+                                • <b>KIL (Kills)</b>: Scaled relative to the server's top killer.<br>
+                                • <b>DTH (Survival)</b>: Scaled based on minimizing player deaths.<br>
+                                • <b>DMD (Damage Dealt)</b>: Scaled relative to the highest damage dealt on the server.<br>
+                                • <b>DMT (Damage Taken)</b>: Scaled based on minimizing damage taken.<br>
+                                • <b>OVR (Overall)</b>: Calculated as the average of KIL, DTH, DMD, and DMT.
+                            </div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">🏅 What are the Card Tiers?</div>
+                            <div class="faq-a">Your player card design changes dynamically based on your OVR rating:<br><br>
+                                🟫 <b>Bronze Card</b> — OVR under 65<br>
+                                ⬜ <b>Silver Card</b> — OVR 65 to 74<br>
+                                🟨 <b>Gold Card</b> — OVR 75 to 89<br>
+                                🌌 <b>Master Card</b> — OVR 90+ (features a special dark theme with custom neon highlights)
+                            </div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">💻 What is TPS?</div>
+                            <div class="faq-a">TPS stands for Ticks Per Second. Minecraft runs at 20 TPS normally. If TPS drops below 20, the server is struggling — things slow down, mobs lag, and the world feels sluggish. The TPS meter on the Server Health tab shows the live value.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">⏱️ What is MSPT?</div>
+                            <div class="faq-a">MSPT is Milliseconds Per Tick — how long it takes the server to process one game tick. The target is under 50ms (20 TPS). The color changes from green → yellow → orange → red as it gets worse. Above 50ms means the server is critically overloaded.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">🔄 How often does data update?</div>
+                            <div class="faq-a">Player stats are synced to the cloud every time a player joins or leaves, and automatically every 5 minutes while online. The dashboard refreshes every 30 seconds. You can also force a refresh using the ↺ button at the top right.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">🎨 Why does my skin not show?</div>
+                            <div class="faq-a">Skins are fetched from mc-heads.net using your SkinsRestorer skin name. If you set your skin using /skin set, it may take up to one relog to sync. If your skin still shows as Steve, ask an admin to check the server console for [WebStats Skin] logs.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">⚡ What is the Live Events tab?</div>
+                            <div class="faq-a">The Live Events tab is a permanent, historical log of all global events on the server. It tracks player events, combat deaths, and whitelist actions in real-time.</div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">🌐 How does DDoS Detection work?</div>
+                            <div class="faq-a">Our <b>Sentinel Engine</b> monitors incoming and outgoing bandwidth in real-time. The Network Usage meter on the Health tab uses a traffic-light system to warn staff of attacks:<br><br>
+                                🔵 <b>Blue</b>: Normal traffic<br>
+                                🟡 <b>Yellow</b>: High load warning<br>
+                                🔴 <b>Red</b>: Active DDoS / Network Saturation detected.
+                            </div>
+                        </div>
+                        <div class="faq-card">
+                            <div class="faq-q">💬 How do I Whitelist via Discord?</div>
+                            <div class="faq-a">To join the server, go to the <b>#whitelist</b> channel in our Discord and type your Minecraft username. Our bot will instantly whitelist you. Note: You can only whitelist ONE account per Discord user. If you need to change your account, please contact an admin.</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Health Dashboard -->
+                <section id="health-section" style="display: none;">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>Health Performance Analytics</h2>
+                            <p>24-hour high-fidelity timeline tracking for server cluster.</p>
+                        </div>
+                    </div>
+                    <div class="health-grid-premium">
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">ONLINE PLAYERS</span>
+                                <i class="fa-solid fa-users h-icon-neon" style="color: var(--primary)"></i>
+                            </div>
+                            <div class="h-value-row" style="font-family: 'JetBrains Mono', monospace;">
+                                <span class="h-value odometer" id="h-players-online">0</span>
+                                <span class="h-unit" style="font-size: 24px; opacity: 0.5; margin: 0 4px;">/</span>
+                                <span class="h-value odometer" id="h-players-max">0</span>
+                            </div>
+                            <div class="h-sub">Total Player Capacity</div>
+                            <div class="h-trend up"><i class="fa-solid fa-signal"></i> Live Sync</div>
+                        </div>
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">SERVER UPTIME</span>
+                                <i class="fa-solid fa-hourglass-half h-icon-neon" style="color: #fbbf24"></i>
+                            </div>
+                            <div class="h-value-row" style="font-family: 'JetBrains Mono', monospace; gap: 2px;">
+                                <span class="h-value odometer" id="h-uptime-hours">0</span>
+                                <span class="h-unit" style="font-size: 14px; margin-right: 6px;">h</span>
+                                <span class="h-value odometer" id="h-uptime-minutes">0</span>
+                                <span class="h-unit" style="font-size: 14px; margin-right: 6px;">m</span>
+                                <span class="h-value odometer" id="h-uptime-seconds">0</span>
+                                <span class="h-unit" style="font-size: 14px;">s</span>
+                            </div>
+                            <div class="h-sub">Time since boot</div>
+                            <div class="h-trend up"><i class="fa-solid fa-arrows-spin"></i> Ticking live</div>
+                        </div>
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">CURRENT TPS</span>
+                                <i class="fa-solid fa-gauge-high h-icon-neon" style="color: var(--online)"></i>
+                            </div>
+                            <div class="h-value-row">
+                                <span class="h-value odometer" id="h-tps">20</span>
+                            </div>
+                            <div class="h-sub">Target: 20.0 TPS</div>
+                            <div class="h-trend up"><i class="fa-solid fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">CURRENT MSPT</span>
+                                <i class="fa-solid fa-bolt h-icon-neon" style="color: var(--mspt-color)"></i>
+                            </div>
+                            <div class="h-value-row">
+                                <span class="h-value odometer" id="h-mspt">0</span>
+                                <span class="h-unit">ms</span>
+                            </div>
+                            <div class="h-sub">Lower is better</div>
+                            <div class="h-trend up"><i class="fa-solid fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">AVERAGE TPS (24H)</span>
+                                <i class="fa-solid fa-clock-rotate-left h-icon-neon" style="color: var(--secondary)"></i>
+                            </div>
+                            <div class="h-value-row">
+                                <span class="h-value odometer" id="h-avg-tps">20</span>
+                            </div>
+                            <div class="h-sub">Over the last day</div>
+                            <div class="h-trend up"><i class="fa-solid fa-arrow-up"></i> 0%</div>
+                        </div>
+                        <div class="health-card-premium">
+                            <div class="h-card-header">
+                                <span class="h-label">AVERAGE MSPT (24H)</span>
+                                <i class="fa-solid fa-chart-line h-icon-neon" style="color: var(--secondary)"></i>
+                            </div>
+                            <div class="h-value-row">
+                                <span class="h-value odometer" id="h-avg-mspt">0</span>
+                                <span class="h-unit">ms</span>
+                            </div>
+                            <div class="h-sub">Over the last day</div>
+                            <div class="h-trend up"><i class="fa-solid fa-arrow-up"></i> 0%</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-title">24-HOUR METRICS SUMMARY</div>
+                    <div class="metrics-summary-grid">
+                        <div class="metric-summary-card">
+                            <span class="m-label">PEAK TPS</span>
+                            <span class="m-value" id="peak-tps">20.00</span>
+                        </div>
+                        <div class="metric-summary-card">
+                            <span class="m-label">LOW TPS</span>
+                            <span class="m-value" id="low-tps">20.00</span>
+                        </div>
+                        <div class="metric-summary-card">
+                            <span class="m-label">PEAK MSPT</span>
+                            <span class="m-value" id="peak-mspt">0.0</span>
+                        </div>
+                        <div class="metric-summary-card">
+                            <span class="m-label">LOW MSPT</span>
+                            <span class="m-value" id="low-mspt">0.0</span>
+                        </div>
+                        <div class="metric-summary-card">
+                            <span class="m-label">PEAK PLAYERS</span>
+                            <span class="m-value" id="peak-players">0</span>
+                        </div>
+                        <div class="metric-summary-card">
+                            <span class="m-label">PEAK NETWORK</span>
+                            <span class="m-value"><span id="peak-net">0.0</span> <small>Mbps</small></span>
+                        </div>
+                    </div>
+
+                    <div class="system-status-console">
+                        <div class="status-header-row">
+                            <i class="fa-solid fa-circle-info"></i> SYSTEM STATUS
+                        </div>
+                        <div class="status-content">
+                            <div class="status-row">
+                                <span class="status-label">Server Performance</span>
+                                <span class="status-value status-excellent" id="status-perf">Excellent</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">TPS Stability</span>
+                                <span class="status-value status-stable" id="status-tps">Stable</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Network Status</span>
+                                <span class="status-value status-stable" id="status-net">Stable</span>
+                            </div>
+                            <div class="status-row">
+                                <span class="status-label">Player Capacity</span>
+                                <span class="status-value status-excellent" id="status-capacity">Moderate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Triple Metric Charts -->
+                    <!-- 2x2 Metric Charts Grid -->
+                    <div class="health-charts-grid">
+                        <div class="chart-container-premium">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="fa-solid fa-users"></i> Online Players</span>
+                                <span class="axis-y-title">Players</span>
+                            </div>
+                            <div class="chart-body" id="wrapper-players">
+                                <svg id="graph-players" width="100%" height="160" preserveAspectRatio="none"></svg>
+                                <div class="chart-tooltip" id="tooltip-players"></div>
+                            </div>
+                        </div>
+                        <div class="chart-container-premium">
+                            <div class="chart-header">
+                                <span class="chart-title" style="color:var(--tps-color)"><i class="fa-solid fa-gauge-high"></i> Engine Speed (TPS)</span>
+                                <span class="axis-y-title">Ticks/Sec</span>
+                            </div>
+                            <div class="chart-body" id="wrapper-tps">
+                                <svg id="graph-tps" width="100%" height="160" preserveAspectRatio="none"></svg>
+                                <div class="chart-tooltip" id="tooltip-tps"></div>
+                            </div>
+                        </div>
+                        <div class="chart-container-premium">
+                            <div class="chart-header">
+                                <span class="chart-title" style="color:var(--mspt-color)"><i class="fa-solid fa-bolt"></i> Tick Duration (MSPT)</span>
+                                <span class="axis-y-title">Millis/Tick</span>
+                            </div>
+                            <div class="chart-body" id="wrapper-mspt">
+                                <svg id="graph-mspt" width="100%" height="160" preserveAspectRatio="none"></svg>
+                                <div class="chart-tooltip" id="tooltip-mspt"></div>
+                            </div>
+                        </div>
+                        <div class="chart-container-premium">
+                            <div class="chart-header">
+                                <span class="chart-title" style="color:#3b82f6"><i class="fa-solid fa-network-wired"></i> Bandwidth (Mbps)</span>
+                                <span class="axis-y-title">Mbps</span>
+                            </div>
+                            <div class="chart-body" id="wrapper-net">
+                                <svg id="graph-net" width="100%" height="160" preserveAspectRatio="none"></svg>
+                                <div class="chart-tooltip" id="tooltip-net"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Teams Section -->
+                <section id="teams-section" style="display: none;">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>Team Standings</h2>
+                            <p>Active squads and their combined performance metrics.</p>
+                        </div>
+                    </div>
+
+                    <!-- Team Stats Summary Row -->
+                    <div class="global-summary-row stagger-1" id="teams-summary-row" style="margin-bottom: 32px;">
+                        <div class="summary-card-premium">
+                            <span class="s-label">TOTAL TEAMS</span>
+                            <span class="s-value" id="t-total-teams">0</span>
+                            <span class="s-sub">Active squads</span>
+                        </div>
+                        <div class="summary-card-premium">
+                            <span class="s-label">TOP TEAM RATING</span>
+                            <span class="s-value" id="t-top-elo">0</span>
+                            <span class="s-sub" id="t-top-name">---</span>
+                        </div>
+                        <div class="summary-card-premium">
+                            <span class="s-label">TOTAL PLAYERS</span>
+                            <span class="s-value" id="t-total-players">0</span>
+                            <span class="s-sub">In teams</span>
+                        </div>
+                    </div>
+
+                    <!-- Team Grid -->
+                    <div class="team-grid" id="team-grid">
+                        <div class="loading-state"><div class="spinner"></div><p>Loading teams...</p></div>
+                    </div>
+
+                    <!-- Team Detail Panel (inline, slides down) -->
+                    <div class="team-detail-container" id="team-detail-container" style="display:none;">
+                        <div class="team-detail-inner">
+                            <div class="team-detail-header">
+                                <div class="team-detail-badge" id="td-badge">🛡️</div>
+                                <div>
+                                    <h2 class="team-detail-name" id="td-name">Team Name</h2>
+                                    <span class="team-detail-sub" id="td-sub">0 members · Created recently</span>
+                                </div>
+                                <button class="team-close-btn" id="team-close-btn"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+
+                            <!-- Combined Stat Cards -->
+                            <div class="team-aggregate-row" id="team-aggregate-row"></div>
+
+                            <!-- Member List Table -->
+                            <div class="team-chart-section">
+                                <h3 class="group-title" style="margin-bottom: 16px;">Squad Members</h3>
+                                <div id="team-roster-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
+                <!-- Live Events Feed Section -->
+                <section id="events-section" style="display: none;">
+                    <div class="section-title">
+                        <div class="title-left">
+                            <h2>Global Event Telemetry</h2>
+                            <p>Real-time historical feed of server-wide player achievements and rankings.</p>
+                        </div>
+                    </div>
+                    <div class="events-console">
+                        <div class="console-header">
+                            <div class="console-dot-group">
+                                <span class="c-dot red"></span>
+                                <span class="c-dot yellow"></span>
+                                <span class="c-dot green"></span>
+                            </div>
+                            <span class="console-title"><i class="fa-solid fa-terminal"></i> EVENT_STREAM.LOG</span>
+                        </div>
+                        <div class="events-feed-container" id="events-feed-container">
+                            <!-- Event log cards injected here -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+    </div>
+
+    <div class="details-panel" id="details-panel">
+        <button class="close-panel" id="close-details"><i class="fa-solid fa-xmark"></i></button>
+        <div class="profile-banner-container">
+            <div class="profile-banner" id="profile-banner"></div>
+        </div>
+
+        <div class="detail-content-wrapper">
+            <!-- Large Player Rating Card -->
+            <div style="display:flex; justify-content:center; margin:16px 0;" class="stagger-1">
+                <div id="profile-card-container"></div>
+            </div>
+
+            <div class="stat-group stagger-2">
+                <div class="stat-grid" id="general-stats-container"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Kill Logs Modal -->
+    <div class="kill-logs-modal-overlay" id="kill-logs-overlay" onclick="closeKillLogsModal()">
+        <div class="kill-logs-modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-skull"></i> Assimilation Logs</h2>
+                <button class="close-modal-btn" onclick="closeKillLogsModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="kill-logs-list">
+                <!-- Data populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container for Live Broadcasts -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js?v=74"></script>
+</body>
+</html>
