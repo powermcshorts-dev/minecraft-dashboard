@@ -1,1 +1,1 @@
-{"server":{"tps":19.87, "mspt":3.1, "players_online":0, "players_max":200, "status":"online", "net_in":0.00, "net_out":0.00, "uptime":28},"players":{},"history":[],"live_logs":[]}
+{"server":{"tps":20.00, "mspt":0.7, "players_online":0, "players_max":200, "status":"online", "net_in":0.00, "net_out":0.00, "uptime":88},"players":{},"history":[{"p":0, "t":20.00, "m":0.5, "ni":0.00, "no":0.00, "ts":1782064354}],"live_logs":[]}
