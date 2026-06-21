@@ -99,23 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             kills: 42, deaths: 18, total_mined: 15400, playtime: 432000,
                             rating_ovr: 78, rating_kil: 79, rating_dth: 75, rating_dmd: 81, rating_dmt: 77,
                             history: []
-                        },
-                        "silver-uuid": {
-                            uuid: "silver-uuid", username: "Grian", online: false,
-                            kills: 15, deaths: 12, total_mined: 89000, playtime: 250000,
-                            rating_ovr: 68, rating_kil: 67, rating_dth: 70, rating_dmd: 65, rating_dmt: 70,
-                            history: []
-                        },
-                        "bronze-uuid": {
-                            uuid: "bronze-uuid", username: "Steve", online: false,
-                            kills: 2, deaths: 25, total_mined: 1200, playtime: 36000,
-                            rating_ovr: 52, rating_kil: 48, rating_dth: 55, rating_dmd: 50, rating_dmt: 55,
-                            history: []
                         }
                     },
-                    live_logs: [
-                        { type: "KILL", user: "Kutto", details: "Kutto killed Grian", time: Math.floor(Date.now()/1000) - 1800 }
-                    ]
+                    live_logs: []
                 };
                 teamsData = [
                     {
