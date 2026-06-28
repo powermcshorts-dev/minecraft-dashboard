@@ -176,13 +176,23 @@
                             <div class="faq-a">The Leaderboard ranks the players by their Overall (OVR) rating by default. You can switch the sort to Kills, Playtime, or Total Mined using the dropdown. The top 3 players get special styling highlights.</div>
                         </div>
                         <div class="faq-card">
-                            <div class="faq-q">⚡ How are Player Ratings calculated?</div>
-                            <div class="faq-a">Player ratings range from 1 to 99 and are calculated server-side based on your performance relative to other players:<br><br>
-                                • <b>KIL (Kills)</b>: Scaled relative to the server's top killer.<br>
-                                • <b>DTH (Survival)</b>: Scaled based on minimizing player deaths.<br>
-                                • <b>DMD (Damage Dealt)</b>: Scaled relative to the highest damage dealt on the server.<br>
-                                • <b>DMT (Damage Taken)</b>: Scaled based on minimizing damage taken.<br>
-                                • <b>OVR (Overall)</b>: Calculated as the average of KIL, DTH, DMD, and DMT.
+                            <div class="faq-q">⚡ How does the Rating &amp; ELO System work?</div>
+                            <div class="faq-a">
+                                Player cards display ratings ranging from 30 to 99, based directly on your live statistics:
+                                <br><br>
+                                📈 <b>How ratings are calculated:</b>
+                                <ul>
+                                    <li><b>KIL (Kill Rating):</b> Starts at 50. Every player kill boosts it dynamically using a curved formula (1 kill = 57, 3 kills = 62, 9 kills = 71, 25 kills = 85, 49+ kills = 99 max).</li>
+                                    <li><b>DTH (Survival Rating):</b> Starts at 80. Every death drops it by 5 points. Every kill increases it slightly to reward combat survival.</li>
+                                    <li><b>DMD (Mining Rating):</b> Starts at 50. Increases as you mine blocks (+1 rating per 100 blocks, up to 99 max).</li>
+                                    <li><b>DMT (Combat Rating):</b> Starts at 50. Increases as you kill mobs (+1 rating per 10 mobs, up to 99 max).</li>
+                                    <li><b>OVR (Overall PVP Rating):</b> The average of your KIL, DTH, DMD, and DMT ratings. Higher OVR upgrades your card from Bronze to Silver, Gold, or Special!</li>
+                                </ul>
+                                ⚖️ <b>Fair Play &amp; Anti-Abuse Rules:</b>
+                                <ul>
+                                    <li>🛡️ <b>Admin Protection:</b> Kills involving an Admin or OP player (either as the killer or the victim) do not count. No ratings, ELO, or stats will be modified.</li>
+                                    <li>⏱️ <b>Spawn Kill Cooldown:</b> If you kill the same player multiple times, a <b>1-hour cooldown</b> is started. Any duplicate kills, deaths, or damage between those two players during this hour will be ignored.</li>
+                                </ul>
                             </div>
                         </div>
                         <div class="faq-card">
