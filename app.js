@@ -125,6 +125,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 players = Object.values(data.players);
                 players.forEach(p => {
                     p.ranked = p.rsmp_rank || 0;
+                    
+                    const kills = p.kills || 0;
+                    const deaths = p.deaths || 0;
+                    const mined = p.total_mined || 0;
+                    const mobKills = p.mob_kills || 0;
+                    
+                    p.rating_kil = Math.max(30, Math.min(99, 50 + Math.round(Math.sqrt(kills) * 7)));
+                    p.rating_dth = Math.max(30, Math.min(99, 80 - deaths * 5 + Math.round(Math.sqrt(kills) * 2.7)));
+                    p.rating_dmd = Math.max(30, Math.min(99, 50 + Math.floor(mined / 100)));
+                    p.rating_dmt = Math.max(30, Math.min(99, 50 + Math.floor(mobKills / 10)));
+                    
+                    p.rating_ovr = Math.round((p.rating_kil + p.rating_dth + p.rating_dmd + p.rating_dmt) / 4);
                 });
             }
             if (data.history) playerHistory = data.history;
