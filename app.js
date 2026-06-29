@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSort = 'rating';
     let currentTab = 'players';
     let rankedOnly = false;
-    let teams = [];
     let tpsOdo = null;
     let msptOdo = null;
     let avgTpsOdo = null;
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const playersSection = document.getElementById('players-section');
     const healthSection = document.getElementById('health-section');
     const faqSection = document.getElementById('faq-section');
-    const teamsSection = document.getElementById('teams-section');
     const eventsSection = document.getElementById('events-section');
     
     // Health UI
@@ -62,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLeaderboards = document.getElementById('nav-leaderboards');
     const navHealth = document.getElementById('nav-health');
     const navFaq = document.getElementById('nav-faq');
-    const navTeams = document.getElementById('nav-teams');
     const navEvents = document.getElementById('nav-events');
     const btnFilterRanked = document.getElementById('btn-filter-ranked');
 
@@ -77,18 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function updateAllData() {
         try {
-            let data;
-            let teamsData = [];
             try {
                 const res = await fetch(DASHBOARD_CONFIG.unified_api_url);
                 data = await res.json();
-                
-                try {
-                    const teamsRes = await fetch(DASHBOARD_CONFIG.teams_api_url);
-                    teamsData = await teamsRes.json();
-                } catch (te) {
-                    console.error("Error fetching teams:", te);
-                }
             } catch (fetchErr) {
                 console.warn("Using mock fallback data for local testing:", fetchErr);
                 data = {
@@ -103,15 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     live_logs: []
                 };
-                teamsData = [
-                    {
-                        name: "Vanquishers", badge: "🏆", created_at: Math.floor(Date.now()/1000) - 86400 * 5,
-                        member_count: 1, total_elo: 78, total_kills: 42, total_deaths: 18, total_mined: 15400, total_mob_kills: 1700,
-                        members: [
-                            { mc_name: "Kutto", elo: 78, kills: 42, deaths: 18, mined: 15400, mob_kills: 1700, discord_id: "456", joined_at: Math.floor(Date.now()/1000) - 86400 * 4 }
-                        ]
-                    }
-                ];
+
             }
 
             if (data.server) {
@@ -128,13 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const kills = p.kills || 0;
                     const deaths = p.deaths || 0;
-                    const mined = p.total_mined || 0;
-                    const mobKills = p.mob_kills || 0;
+                    const damageDealt = p.damage || 0;
+                    const damageTaken = p.damage_taken || 0;
                     
                     p.rating_kil = Math.max(30, Math.min(99, 50 + Math.round(Math.sqrt(kills) * 7)));
                     p.rating_dth = Math.max(30, Math.min(99, 80 - deaths * 5 + Math.round(Math.sqrt(kills) * 2.7)));
-                    p.rating_dmd = Math.max(30, Math.min(99, 50 + Math.floor(mined / 100)));
-                    p.rating_dmt = Math.max(30, Math.min(99, 50 + Math.floor(mobKills / 10)));
+                    p.rating_dmd = Math.max(30, Math.min(99, 50 + Math.round(Math.sqrt(damageDealt) * 2) - Math.round(Math.sqrt(damageTaken) * 0.8)));
+                    p.rating_dmt = Math.max(30, Math.min(99, 80 - Math.round(Math.sqrt(damageTaken) * 1.8) + Math.round(Math.sqrt(damageDealt) * 0.8)));
                     
                     p.rating_ovr = Math.round((p.rating_kil + p.rating_dth + p.rating_dmd + p.rating_dmt) / 4);
                 });
@@ -148,8 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     lastSeenLogTime = Math.max(lastSeenLogTime, log.time);
                 });
             }
-            
-            teams = teamsData;
+
 
             renderAll();
             updateGlobalCompetitionSummary();
@@ -548,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card-top">
                         <div class="card-left">
                             <span class="card-ovr">${ovr}</span>
-                            <span class="card-pos">PVP</span>
+                            <span class="card-pos">OVR</span>
                         </div>
                         <div class="card-avatar">
                             <img src="https://mc-heads.net/avatar/${skinIdentity}/120" alt="${player.username}">
@@ -780,8 +759,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="stat-card"><span class="stat-label">Deaths</span><span class="stat-value odometer" id="stat-deaths">${deaths}</span></div>
                         <div class="stat-card"><span class="stat-label">Kills</span><span class="stat-value odometer" id="stat-kills">${kills}</span></div>
                         <div class="stat-card"><span class="stat-label">K/D</span><span class="stat-value" id="stat-kd">${kd}</span></div>
-                        <div class="stat-card"><span class="stat-label">Mined</span><span class="stat-value odometer" id="stat-mined">${mined}</span></div>
-                        <div class="stat-card"><span class="stat-label">Placed</span><span class="stat-value odometer" id="stat-placed">${placed}</span></div>
+                        <div class="stat-card"><span class="stat-label">PvP Dmg Dealt</span><span class="stat-value odometer" id="stat-dmg-dealt">${player.damage || 0}</span></div>
+                        <div class="stat-card"><span class="stat-label">PvP Dmg Taken</span><span class="stat-value odometer" id="stat-dmg-taken">${player.damage_taken || 0}</span></div>
                         <div class="stat-card"><span class="stat-label">Mob Kills</span><span class="stat-value odometer" id="stat-mobs">${mobs}</span></div>`;
                 }
 
@@ -801,8 +780,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateOdo('stat-deaths', deaths);
                 updateOdo('stat-kills', kills);
                 updateOdo('stat-kd', kd);
-                updateOdo('stat-mined', mined);
-                updateOdo('stat-placed', placed);
+                updateOdo('stat-dmg-dealt', player.damage || 0);
+                updateOdo('stat-dmg-taken', player.damage_taken || 0);
                 updateOdo('stat-mobs', mobs);
 
                 let existingBtn = document.getElementById('btn-kill-logs');
@@ -956,10 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (tab === 'faq') {
             navFaq.classList.add('active');
             faqSection.style.display = 'block';
-        } else if (tab === 'teams') {
-            if (navTeams) navTeams.classList.add('active');
-            if (teamsSection) teamsSection.style.display = 'block';
-            renderTeams();
+
         } else if (tab === 'events') {
             navEvents.classList.add('active');
             eventsSection.style.display = 'block';
@@ -971,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
     navLeaderboards.addEventListener('click', () => switchTab('leaderboard'));
     navHealth.addEventListener('click', () => switchTab('health'));
     navFaq.addEventListener('click', () => switchTab('faq'));
-    if (navTeams) navTeams.addEventListener('click', () => switchTab('teams'));
+
     navEvents.addEventListener('click', () => switchTab('events'));
     closePanelBtn.addEventListener('click', () => { detailsPanel.classList.remove('open'); selectedPlayer = null; });
     sortBySelect.addEventListener('change', (e) => { currentSort = e.target.value; renderAll(); });
@@ -990,7 +966,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentTab === 'players') renderPlayersGrid();
         else if (currentTab === 'leaderboard') renderLeaderboard();
         else if (currentTab === 'events') renderEvents();
-        else if (currentTab === 'teams') renderTeams();
     });
 
     // FAQ accordion: click question to toggle answer
@@ -1254,217 +1229,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    let selectedTeam = null;
-
-    function renderTeams() {
-        const teamGrid = document.getElementById('team-grid');
-        if (!teamGrid) return;
-
-        if (!teams || teams.length === 0) {
-            teamGrid.innerHTML = `
-                <div class="team-no-data" style="grid-column: 1/-1;">
-                    <i class="fa-solid fa-shield-halved" style="font-size: 3rem; opacity: 0.2; display: block; margin-bottom: 16px;"></i>
-                    <p>No active teams have registered yet.</p>
-                </div>
-            `;
-            updateTeamsSummary();
-            return;
-        }
-
-        teamGrid.className = 'team-grid';
-        teamGrid.innerHTML = teams.map(team => {
-            const avatarsHtml = team.members.slice(0, 5).map(m => {
-                const playerObj = players.find(p => p.username.toLowerCase() === m.mc_name.toLowerCase());
-                const skin = playerObj?.skin || m.mc_name;
-                return `<div class="team-avatar-mini" title="${m.mc_name}"><img src="https://mc-heads.net/avatar/${skin}/48" alt="${m.mc_name}"></div>`;
-            }).join('');
-            
-            const overflow = team.member_count > 5 ? `<div class="team-avatar-overflow">+${team.member_count - 5}</div>` : '';
-
-            return `
-                <div class="team-card ${selectedTeam && selectedTeam.name === team.name ? 'active-card' : ''}" onclick="selectTeam('${team.name.replace(/'/g, "\\'")}')">
-                    <span class="team-badge-large">${team.badge || '🛡️'}</span>
-                    <div class="team-card-name">${team.name}</div>
-                    <div class="team-card-member-count"><i class="fa-solid fa-users"></i> ${team.member_count} Members</div>
-                    <div class="team-avatar-row">
-                        ${avatarsHtml}
-                        ${overflow}
-                    </div>
-                    <div class="team-stat-strip">
-                        <div class="team-stat-strip-inner" style="display: flex; justify-content: space-around; width: 100%;">
-                            <div class="team-strip-item">
-                                <span class="team-strip-val">${team.total_elo}</span>
-                                <span class="team-strip-lab">OVR</span>
-                            </div>
-                            <div class="team-strip-item">
-                                <span class="team-strip-val">${team.total_kills}</span>
-                                <span class="team-strip-lab">KILLS</span>
-                            </div>
-                            <div class="team-strip-item">
-                                <span class="team-strip-val">${team.total_deaths}</span>
-                                <span class="team-strip-lab">DEATHS</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        updateTeamsSummary();
-        if (selectedTeam) {
-            const updated = teams.find(t => t.name === selectedTeam.name);
-            if (updated) {
-                showTeamDetails(updated);
-            }
-        }
-    }
-
-    function updateTeamsSummary() {
-        const tTotalTeams = document.getElementById('t-total-teams');
-        const tTopElo = document.getElementById('t-top-elo');
-        const tTopName = document.getElementById('t-top-name');
-        const tTotalPlayers = document.getElementById('t-total-players');
-
-        if (!tTotalTeams) return;
-
-        tTotalTeams.textContent = teams.length;
-        
-        let totalPlayers = 0;
-        let bestTeam = null;
-        teams.forEach(t => {
-            totalPlayers += t.member_count;
-            if (!bestTeam || t.total_elo > bestTeam.total_elo) {
-                bestTeam = t;
-            }
-        });
-
-        tTotalPlayers.textContent = totalPlayers;
-        if (bestTeam) {
-            tTopElo.textContent = bestTeam.total_elo;
-            tTopName.textContent = bestTeam.name;
-        } else {
-            tTopElo.textContent = "0";
-            tTopName.textContent = "---";
-        }
-    }
-
-    window.selectTeam = (name) => {
-        const team = teams.find(t => t.name === name);
-        if (!team) return;
-        selectedTeam = team;
-        showTeamDetails(team);
-        document.querySelectorAll('.team-card').forEach(card => {
-            const cardName = card.querySelector('.team-card-name')?.textContent;
-            card.classList.toggle('active-card', cardName === name);
-        });
-    };
-
-    function showTeamDetails(team) {
-        const detailContainer = document.getElementById('team-detail-container');
-        if (!detailContainer) return;
-
-        const tdBadge = document.getElementById('td-badge');
-        const tdName = document.getElementById('td-name');
-        const tdSub = document.getElementById('td-sub');
-        const aggRow = document.getElementById('team-aggregate-row');
-        const chartDiv = document.getElementById('team-elo-chart');
-        const rosterList = document.getElementById('team-roster-list');
-
-        if (tdBadge) tdBadge.textContent = team.badge || '🛡️';
-        if (tdName) tdName.textContent = team.name;
-        if (tdSub) {
-            const dateStr = team.created_at ? new Date(team.created_at * 1000).toLocaleDateString(undefined, {month: 'long', day: 'numeric', year: 'numeric'}) : 'recently';
-            tdSub.textContent = `${team.member_count} members · Registered on ${dateStr}`;
-        }
-
-        if (aggRow) {
-            const avgElo = team.member_count > 0 ? Math.round(team.total_elo / team.member_count) : 0;
-            const avgMined = team.member_count > 0 ? Math.round(team.total_mined / team.member_count) : 0;
-            const kd = (team.total_kills / Math.max(1, team.total_deaths)).toFixed(2);
-
-            aggRow.innerHTML = `
-                <div class="team-agg-card">
-                    <span class="team-agg-label">Average OVR</span>
-                    <span class="team-agg-value" style="color: var(--primary);">${avgElo}</span>
-                </div>
-                <div class="team-agg-card">
-                    <span class="team-agg-label">Team K/D</span>
-                    <span class="team-agg-value">${kd}</span>
-                </div>
-                <div class="team-agg-card">
-                    <span class="team-agg-label">Total Blocks Mined</span>
-                    <span class="team-agg-value" style="color:#60a5fa;">${team.total_mined.toLocaleString()}</span>
-                </div>
-                <div class="team-agg-card">
-                    <span class="team-agg-label">Avg Mined</span>
-                    <span class="team-agg-value">${avgMined.toLocaleString()}</span>
-                </div>
-                <div class="team-agg-card">
-                    <span class="team-agg-label">Total Mob Kills</span>
-                    <span class="team-agg-value" style="color:#4ade80;">${team.total_mob_kills.toLocaleString()}</span>
-                </div>
-            `;
-        }
-
-        if (chartDiv) {
-            const maxElo = Math.max(...team.members.map(m => m.elo), 100);
-            chartDiv.innerHTML = team.members.map(m => {
-                const eloRank = getRank(m.elo);
-                const pct = (m.elo / maxElo) * 100;
-                return `
-                    <div class="graph-row" style="margin-bottom: 15px;">
-                        <div class="graph-label" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
-                            <span>${m.mc_name}</span>
-                            <span style="font-family: 'JetBrains Mono', monospace; font-weight: 800; color: ${eloRank.color};">${m.elo} OVR</span>
-                        </div>
-                        <div class="graph-bar-container">
-                            <div class="graph-bar" style="width: ${pct}%; background: ${eloRank.color};"></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        if (rosterList) {
-            rosterList.innerHTML = team.members.map(m => {
-                const kd = (m.kills / Math.max(1, m.deaths)).toFixed(2);
-                const playerObj = players.find(p => p.username.toLowerCase() === m.mc_name.toLowerCase());
-                const skin = playerObj?.skin || m.mc_name;
-                const eloRank = getRank(m.elo);
-                const isCaptain = team.captain_discord && (m.discord_id === team.captain_discord);
-                return `
-                    <div class="team-roster-row" onclick="showPlayerDetails('${playerObj?.uuid || ''}')" style="${playerObj ? 'cursor:pointer;' : 'pointer-events:none;'}">
-                        <div class="team-roster-avatar"><img src="https://mc-heads.net/avatar/${skin}/36" alt="${m.mc_name}"></div>
-                        <div class="team-roster-name">
-                            ${m.mc_name} 
-                            ${isCaptain ? '<span style="color:#fbbf24; font-size:10px; font-weight:800; background:rgba(251,191,36,0.1); border:1px solid #fbbf24; border-radius:4px; padding:1px 5px; margin-left:6px;">CAPTAIN</span>' : ''}
-                        </div>
-                        <div class="team-roster-kd"><i class="fa-solid fa-skull" style="font-size:10px; opacity:0.6; margin-right:4px;"></i> ${m.kills}/${m.deaths} (K/D: ${kd})</div>
-                        <div class="team-roster-elo" style="color:${eloRank.color}; border-color:${eloRank.color}44; background:${eloRank.color}11;">${m.elo} OVR</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        detailContainer.style.display = 'block';
-    }
-
-    const teamCloseBtn = document.getElementById('team-close-btn');
-    if (teamCloseBtn) {
-        teamCloseBtn.addEventListener('click', () => {
-            const detailContainer = document.getElementById('team-detail-container');
-            if (detailContainer) detailContainer.style.display = 'none';
-            selectedTeam = null;
-            document.querySelectorAll('.team-card').forEach(card => card.classList.remove('active-card'));
-        });
-    }
-
-    function getWeaponIcon(weapon) {
-        if (!weapon || weapon === 'None') return 'fa-shield-halved';
-        const w = weapon.toLowerCase();
-        if (w.includes('trident')) return 'fa-anchor'; // free alternative to fa-trident
-        if (w.includes('crossbow')) return 'fa-bullseye';
-        if (w.includes('mace')) return 'fa-hammer';
-        return 'fa-shield-halved';
-    }
 });
