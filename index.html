@@ -51,10 +51,7 @@
                     <i class="fa-solid fa-circle-question"></i>
                     <span>FAQ / Guide</span>
                 </div>
-                <div class="nav-item" id="nav-teams">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>Teams</span>
-                </div>
+
                 <div class="nav-item" id="nav-events">
                     <i class="fa-solid fa-bolt-lightning"></i>
                     <span>Live Events</span>
@@ -184,8 +181,8 @@
                                 <ul>
                                     <li><b>KIL (Kill Rating):</b> Starts at 50. Every player kill boosts it dynamically using a curved formula (1 kill = 57, 3 kills = 62, 9 kills = 71, 25 kills = 85, 49+ kills = 99 max).</li>
                                     <li><b>DTH (Survival Rating):</b> Starts at 80. Every death drops it by 5 points. Every kill increases it slightly to reward combat survival.</li>
-                                    <li><b>DMD (Mining Rating):</b> Starts at 50. Increases as you mine blocks (+1 rating per 100 blocks, up to 99 max).</li>
-                                    <li><b>DMT (Combat Rating):</b> Starts at 50. Increases as you kill mobs (+1 rating per 10 mobs, up to 99 max).</li>
+                                    <li><b>DMD (Damage Dealt Rating):</b> Starts at 50. Increases as you deal damage to other players (PvP), and decreases slightly as you take damage from other players.</li>
+                                    <li><b>DMT (Damage Taken Rating):</b> Starts at 80. Decreases as you take damage from other players, but is offset as you deal damage back to them.</li>
                                     <li><b>OVR (Overall PVP Rating):</b> The average of your KIL, DTH, DMD, and DMT ratings. Higher OVR upgrades your card from Bronze to Silver, Gold, or Special!</li>
                                 </ul>
                                 ⚖️ <b>Fair Play &amp; Anti-Abuse Rules:</b>
@@ -423,62 +420,7 @@
                     </div>
                 </section>
 
-                <!-- Teams Section -->
-                <section id="teams-section" style="display: none;">
-                    <div class="section-title">
-                        <div class="title-left">
-                            <h2>Team Standings</h2>
-                            <p>Active squads and their combined performance metrics.</p>
-                        </div>
-                    </div>
 
-                    <!-- Team Stats Summary Row -->
-                    <div class="global-summary-row stagger-1" id="teams-summary-row" style="margin-bottom: 32px;">
-                        <div class="summary-card-premium">
-                            <span class="s-label">TOTAL TEAMS</span>
-                            <span class="s-value" id="t-total-teams">0</span>
-                            <span class="s-sub">Active squads</span>
-                        </div>
-                        <div class="summary-card-premium">
-                            <span class="s-label">TOP TEAM RATING</span>
-                            <span class="s-value" id="t-top-elo">0</span>
-                            <span class="s-sub" id="t-top-name">---</span>
-                        </div>
-                        <div class="summary-card-premium">
-                            <span class="s-label">TOTAL PLAYERS</span>
-                            <span class="s-value" id="t-total-players">0</span>
-                            <span class="s-sub">In teams</span>
-                        </div>
-                    </div>
-
-                    <!-- Team Grid -->
-                    <div class="team-grid" id="team-grid">
-                        <div class="loading-state"><div class="spinner"></div><p>Loading teams...</p></div>
-                    </div>
-
-                    <!-- Team Detail Panel (inline, slides down) -->
-                    <div class="team-detail-container" id="team-detail-container" style="display:none;">
-                        <div class="team-detail-inner">
-                            <div class="team-detail-header">
-                                <div class="team-detail-badge" id="td-badge">🛡️</div>
-                                <div>
-                                    <h2 class="team-detail-name" id="td-name">Team Name</h2>
-                                    <span class="team-detail-sub" id="td-sub">0 members · Created recently</span>
-                                </div>
-                                <button class="team-close-btn" id="team-close-btn"><i class="fa-solid fa-xmark"></i></button>
-                            </div>
-
-                            <!-- Combined Stat Cards -->
-                            <div class="team-aggregate-row" id="team-aggregate-row"></div>
-
-                            <!-- Member List Table -->
-                            <div class="team-chart-section">
-                                <h3 class="group-title" style="margin-bottom: 16px;">Squad Members</h3>
-                                <div id="team-roster-list"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
 
                 <!-- Live Events Feed Section -->
